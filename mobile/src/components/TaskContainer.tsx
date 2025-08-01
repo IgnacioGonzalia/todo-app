@@ -1,5 +1,11 @@
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Animated,
+} from "react-native";
 import Task from "./Task";
 import { useTheme } from "../global/ThemeContext";
 import { getFontStyle } from "../global/typhography";
@@ -10,6 +16,7 @@ interface TaskContainerProps {
   deletingTaskId?: number | null;
   completeTask: (taskId: number) => void;
   deleteTask: (taskId: number) => void;
+  currentFilter?: string;
 }
 
 const TaskContainer = ({
@@ -18,12 +25,66 @@ const TaskContainer = ({
   deletingTaskId,
   completeTask,
   deleteTask,
+  currentFilter,
 }: TaskContainerProps) => {
   const { colors } = useTheme();
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const [displayedTasks, setDisplayedTasks] = useState(tasks);
+  const previousFilter = useRef(currentFilter);
+
+  // Animation for filter change
+  useEffect(() => {
+    if (previousFilter.current === currentFilter) {
+      setDisplayedTasks(tasks);
+      return;
+    }
+
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: -12,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setDisplayedTasks(tasks);
+      setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 250,
+            useNativeDriver: true,
+          }),
+          Animated.spring(slideAnim, {
+            toValue: 0,
+            tension: 100,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }, 100);
+    });
+
+    previousFilter.current = currentFilter;
+  }, [currentFilter, tasks, fadeAnim, slideAnim]);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.white }]}>
-      {tasks.map((task) => (
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.white,
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        },
+      ]}
+    >
+      {displayedTasks.map((task) => (
         <React.Fragment key={task.id}>
           <Task
             id={task.id}
@@ -34,12 +95,16 @@ const TaskContainer = ({
             completeTask={() => completeTask(task.id)}
             deleteTask={() => deleteTask(task.id)}
           />
-          <View style={styles.divider}></View>
+          <View
+            style={[styles.divider, { backgroundColor: colors.greyBorder }]}
+          ></View>
         </React.Fragment>
       ))}
       <View style={styles.footerContainer}>
         <Text style={[styles.text, { color: colors.text }]}>
-          {`${tasks.length} task${tasks.length !== 1 ? "s" : ""} left`}
+          {`${displayedTasks.length} task${
+            displayedTasks.length !== 1 ? "s" : ""
+          } left`}
         </Text>
         <TouchableOpacity onPress={() => console.log("Clear completed tasks")}>
           <Text style={[styles.text, { color: colors.text }]}>
@@ -47,7 +112,7 @@ const TaskContainer = ({
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -64,7 +129,6 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#E3E4F1",
   },
   footerContainer: {
     flexDirection: "row",

@@ -5,6 +5,7 @@ import TaskInput from "../components/TaskInput";
 import TaskContainer from "../components/TaskContainer";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import TaskFilter from "../components/TaskFilter";
 
 const STORAGE_KEY = "TASKS";
 
@@ -19,6 +20,7 @@ const Home = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskId, setNewTaskId] = useState<number | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
+  const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -76,6 +78,12 @@ const Home = () => {
     }, 400);
   };
 
+  const filteredTasks = tasks.filter((task) => {
+    if (filter === "active") return !task.completed;
+    if (filter === "completed") return task.completed;
+    return true;
+  });
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.bgImageContainer}>
@@ -91,12 +99,14 @@ const Home = () => {
       <Header />
       <TaskInput onAddTask={addTask} />
       <TaskContainer
-        tasks={tasks}
+        tasks={filteredTasks}
         newTaskId={newTaskId}
         deletingTaskId={deletingTaskId}
         completeTask={completeTask}
         deleteTask={deleteTask}
+        currentFilter={filter}
       />
+      {tasks.length > 0 && <TaskFilter filter={filter} setFilter={setFilter} />}
     </View>
   );
 };
