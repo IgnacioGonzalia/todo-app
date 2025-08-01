@@ -84,6 +84,11 @@ const Home = () => {
     return true;
   });
 
+  const clearCompleted = () => {
+    setTasks((prev) => prev.filter((task) => !task.completed));
+    setFilter("all");
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.bgImageContainer}>
@@ -105,6 +110,7 @@ const Home = () => {
         completeTask={completeTask}
         deleteTask={deleteTask}
         currentFilter={filter}
+        clearCompleted={clearCompleted}
       />
       {tasks.length > 0 && <TaskFilter filter={filter} setFilter={setFilter} />}
     </View>

@@ -13,7 +13,7 @@ const TaskInput = ({
 
   const handleEndEditing = () => {
     if (text.trim()) {
-      onAddTask(text);
+      onAddTask(text.trim());
       setText("");
     }
   };

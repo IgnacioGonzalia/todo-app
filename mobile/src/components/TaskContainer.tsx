@@ -17,6 +17,7 @@ interface TaskContainerProps {
   completeTask: (taskId: number) => void;
   deleteTask: (taskId: number) => void;
   currentFilter?: string;
+  clearCompleted: () => void;
 }
 
 const TaskContainer = ({
@@ -26,17 +27,59 @@ const TaskContainer = ({
   completeTask,
   deleteTask,
   currentFilter,
+  clearCompleted,
 }: TaskContainerProps) => {
   const { colors } = useTheme();
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
+  const buttonOpacity = useRef(new Animated.Value(0)).current;
+  const buttonScale = useRef(new Animated.Value(0.8)).current;
   const [displayedTasks, setDisplayedTasks] = useState(tasks);
+  const [displayedFilter, setDisplayedFilter] = useState(currentFilter);
+  const [clearingTasks, setClearingTasks] = useState<number[]>([]);
   const previousFilter = useRef(currentFilter);
+  const isAnyIncompleteTask = tasks.some((task) => task.completed);
+  const incompleteTaskNumber = tasks.filter((task) => !task.completed).length;
+  const shouldShowButton = displayedFilter !== "active" && isAnyIncompleteTask;
+
+  // Clear completed button animation
+  useEffect(() => {
+    if (shouldShowButton) {
+      Animated.parallel([
+        Animated.timing(buttonOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.spring(buttonScale, {
+          toValue: 1,
+          tension: 120,
+          friction: 7,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(buttonOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.spring(buttonScale, {
+          toValue: 0.8,
+          tension: 120,
+          friction: 7,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [shouldShowButton, buttonOpacity, buttonScale]);
 
   // Animation for filter change
   useEffect(() => {
     if (previousFilter.current === currentFilter) {
       setDisplayedTasks(tasks);
+      setDisplayedFilter(currentFilter);
       return;
     }
 
@@ -53,6 +96,7 @@ const TaskContainer = ({
       }),
     ]).start(() => {
       setDisplayedTasks(tasks);
+      setDisplayedFilter(currentFilter);
       setTimeout(() => {
         Animated.parallel([
           Animated.timing(fadeAnim, {
@@ -73,6 +117,21 @@ const TaskContainer = ({
     previousFilter.current = currentFilter;
   }, [currentFilter, tasks, fadeAnim, slideAnim]);
 
+  const handleClearCompleted = () => {
+    const completedTaskIds = displayedTasks
+      .filter((task) => task.completed)
+      .map((task) => task.id);
+
+    if (completedTaskIds.length === 0) return;
+
+    setClearingTasks(completedTaskIds);
+
+    setTimeout(() => {
+      clearCompleted();
+      setClearingTasks([]);
+    }, 400);
+  };
+
   return (
     <Animated.View
       style={[
@@ -91,7 +150,9 @@ const TaskContainer = ({
             text={task.text}
             completed={task.completed}
             isNew={task.id === newTaskId}
-            isDeleting={task.id === deletingTaskId}
+            isDeleting={
+              task.id === deletingTaskId || clearingTasks.includes(task.id)
+            }
             completeTask={() => completeTask(task.id)}
             deleteTask={() => deleteTask(task.id)}
           />
@@ -102,15 +163,25 @@ const TaskContainer = ({
       ))}
       <View style={styles.footerContainer}>
         <Text style={[styles.text, { color: colors.text }]}>
-          {`${displayedTasks.length} task${
-            displayedTasks.length !== 1 ? "s" : ""
+          {`${incompleteTaskNumber} task${
+            incompleteTaskNumber !== 1 ? "s" : ""
           } left`}
         </Text>
-        <TouchableOpacity onPress={() => console.log("Clear completed tasks")}>
-          <Text style={[styles.text, { color: colors.text }]}>
-            Clear Completed
-          </Text>
-        </TouchableOpacity>
+        <Animated.View
+          style={{
+            opacity: buttonOpacity,
+            transform: [{ scale: buttonScale }],
+          }}
+        >
+          <TouchableOpacity
+            onPress={handleClearCompleted}
+            disabled={!shouldShowButton}
+          >
+            <Text style={[styles.text, { color: colors.text }]}>
+              Clear Completed
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     </Animated.View>
   );
