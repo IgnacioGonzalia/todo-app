@@ -7,6 +7,7 @@ const light = {
   checkedText: "#D1D2DA",
   text: "#494C6B",
   blue: "#3A7CFD",
+  divider: "#E3E4F1",
 };
 
 const dark = {
@@ -18,6 +19,7 @@ const dark = {
   checkedText: "#4D5067",
   text: "#C8CBE7",
   blue: "#3A7CFD",
+  divider: "#393A4B",
 };
 
 export const getColors = (theme: "light" | "dark") =>

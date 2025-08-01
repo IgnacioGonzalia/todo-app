@@ -96,7 +96,7 @@ const TaskContainer = ({
             deleteTask={() => deleteTask(task.id)}
           />
           <View
-            style={[styles.divider, { backgroundColor: colors.greyBorder }]}
+            style={[styles.divider, { backgroundColor: colors.divider }]}
           ></View>
         </React.Fragment>
       ))}
