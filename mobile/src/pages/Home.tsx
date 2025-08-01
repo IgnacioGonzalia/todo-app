@@ -18,6 +18,7 @@ const Home = () => {
   const { colors, isDarkMode } = useTheme();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskId, setNewTaskId] = useState<number | null>(null);
+  const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -63,6 +64,18 @@ const Home = () => {
     );
   };
 
+  const filterOutTask = (tasks: Task[], taskId: number) => {
+    return tasks.filter((task) => task.id !== taskId);
+  };
+
+  const deleteTask = (taskId: number) => {
+    setDeletingTaskId(taskId);
+    setTimeout(() => {
+      setTasks((prev) => filterOutTask(prev, taskId));
+      setDeletingTaskId(null);
+    }, 400);
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.bgImageContainer}>
@@ -80,7 +93,9 @@ const Home = () => {
       <TaskContainer
         tasks={tasks}
         newTaskId={newTaskId}
+        deletingTaskId={deletingTaskId}
         completeTask={completeTask}
+        deleteTask={deleteTask}
       />
     </View>
   );

@@ -7,13 +7,17 @@ import { getFontStyle } from "../global/typhography";
 interface TaskContainerProps {
   tasks: Array<{ id: number; text: string; completed: boolean }>;
   newTaskId?: number | null;
+  deletingTaskId?: number | null;
   completeTask: (taskId: number) => void;
+  deleteTask: (taskId: number) => void;
 }
 
 const TaskContainer = ({
   tasks,
   newTaskId,
+  deletingTaskId,
   completeTask,
+  deleteTask,
 }: TaskContainerProps) => {
   const { colors } = useTheme();
 
@@ -26,7 +30,9 @@ const TaskContainer = ({
             text={task.text}
             completed={task.completed}
             isNew={task.id === newTaskId}
+            isDeleting={task.id === deletingTaskId}
             completeTask={() => completeTask(task.id)}
+            deleteTask={() => deleteTask(task.id)}
           />
           <View style={styles.divider}></View>
         </React.Fragment>

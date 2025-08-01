@@ -3,19 +3,25 @@ import { useTheme } from "../global/ThemeContext";
 import { getFontStyle } from "../global/typhography";
 import { useEffect, useRef } from "react";
 
-const Task = ({
-  id,
-  text,
-  completed,
-  isNew = false,
-  completeTask,
-}: {
+interface TaskProps {
   id: number;
   text: string;
   completed: boolean;
   isNew?: boolean;
+  isDeleting?: boolean;
   completeTask: (taskId: number) => void;
-}) => {
+  deleteTask: (taskId: number) => void;
+}
+
+const Task = ({
+  id,
+  text,
+  completed,
+  isNew,
+  isDeleting,
+  completeTask,
+  deleteTask,
+}: TaskProps) => {
   const { colors } = useTheme();
   const slideAnim = useRef(new Animated.Value(isNew ? -50 : 0)).current;
   const fadeAnim = useRef(new Animated.Value(isNew ? 0 : 1)).current;
@@ -58,6 +64,25 @@ const Task = ({
       }),
     ]).start();
   }, [completed, checkboxScale, textOpacity]);
+
+  // Animation for delete action
+  useEffect(() => {
+    if (isDeleting) {
+      Animated.parallel([
+        Animated.spring(slideAnim, {
+          toValue: -50,
+          tension: 100,
+          friction: 8,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [isDeleting, slideAnim, fadeAnim]);
 
   const handleComplete = () => {
     Animated.sequence([
@@ -119,7 +144,7 @@ const Task = ({
       >
         {text}
       </Animated.Text>
-      <TouchableOpacity onPress={() => console.log("Delete task")}>
+      <TouchableOpacity onPress={() => deleteTask(id)}>
         <Image
           source={require("../../images/delete.png")}
           style={styles.deleteIcon}
