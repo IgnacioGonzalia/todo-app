@@ -3,9 +3,20 @@ import { getFontStyle } from "../global/typhography";
 import { useState } from "react";
 import { useTheme } from "../global/ThemeContext";
 
-const TaskInput = () => {
+const TaskInput = ({
+  onAddTask,
+}: {
+  onAddTask: (taskText: string) => void;
+}) => {
   const { colors } = useTheme();
   const [text, setText] = useState<string>("");
+
+  const handleEndEditing = () => {
+    if (text.trim()) {
+      onAddTask(text);
+      setText("");
+    }
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.white }]}>
@@ -19,6 +30,7 @@ const TaskInput = () => {
         style={[styles.input, { color: colors.text }]}
         value={text}
         onChangeText={setText}
+        onEndEditing={handleEndEditing}
       />
     </View>
   );

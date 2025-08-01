@@ -3,15 +3,57 @@ import { useTheme } from "../global/ThemeContext";
 import Header from "../components/Header";
 import TaskInput from "../components/TaskInput";
 import TaskContainer from "../components/TaskContainer";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const STORAGE_KEY = "TASKS";
+
+type Task = {
+  id: number;
+  text: string;
+  completed: boolean;
+};
 
 const Home = () => {
   const { colors, isDarkMode } = useTheme();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [newTaskId, setNewTaskId] = useState<number | null>(null);
 
-  const mockTasks = [
-    { id: 1, text: "Complete online JavaScript course", completed: true },
-    { id: 2, text: "Jog around the park 3x", completed: false },
-    { id: 3, text: "10 minutes meditation", completed: false },
-  ];
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        const storedTasks = await AsyncStorage.getItem(STORAGE_KEY);
+        if (storedTasks) setTasks(JSON.parse(storedTasks));
+      } catch (error) {
+        console.error("Failed to load tasks from storage:", error);
+      }
+    };
+    loadTasks();
+  }, []);
+
+  useEffect(() => {
+    const saveTasks = async () => {
+      try {
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      } catch (e) {
+        console.error("Error saving tasks to storage", e);
+      }
+    };
+    saveTasks();
+  }, [tasks]);
+
+  const addTask = (taskText: string) => {
+    const task = {
+      id: Date.now(),
+      text: taskText,
+      completed: false,
+    };
+    setTasks((prev) => [...prev, task]);
+    setNewTaskId(task.id);
+    setTimeout(() => {
+      setNewTaskId(null);
+    }, 500);
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -26,8 +68,8 @@ const Home = () => {
         />
       </View>
       <Header />
-      <TaskInput />
-      <TaskContainer tasks={mockTasks} />
+      <TaskInput onAddTask={addTask} />
+      <TaskContainer tasks={tasks} newTaskId={newTaskId} />
     </View>
   );
 };

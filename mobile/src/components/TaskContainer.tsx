@@ -6,16 +6,22 @@ import { getFontStyle } from "../global/typhography";
 
 interface TaskContainerProps {
   tasks: Array<{ id: number; text: string; completed: boolean }>;
+  newTaskId?: number | null;
 }
 
-const TaskContainer = ({ tasks }: TaskContainerProps) => {
+const TaskContainer = ({ tasks, newTaskId }: TaskContainerProps) => {
   const { colors } = useTheme();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.white }]}>
       {tasks.map((task) => (
         <React.Fragment key={task.id}>
-          <Task id={task.id} text={task.text} completed={task.completed} />
+          <Task
+            id={task.id}
+            text={task.text}
+            completed={task.completed}
+            isNew={task.id === newTaskId}
+          />
           <View style={styles.divider}></View>
         </React.Fragment>
       ))}

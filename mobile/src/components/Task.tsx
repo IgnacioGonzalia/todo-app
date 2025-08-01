@@ -1,20 +1,57 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
 import { useTheme } from "../global/ThemeContext";
 import { getFontStyle } from "../global/typhography";
+import { useEffect, useRef } from "react";
 
 const Task = ({
   id,
   text,
   completed,
+  isNew = false,
 }: {
   id: number;
   text: string;
   completed: boolean;
+  isNew?: boolean;
 }) => {
   const { colors } = useTheme();
+  const slideAnim = useRef(new Animated.Value(isNew ? -50 : 0)).current;
+  const fadeAnim = useRef(new Animated.Value(isNew ? 0 : 1)).current;
+
+  useEffect(() => {
+    if (isNew) {
+      Animated.parallel([
+        Animated.spring(slideAnim, {
+          toValue: 0,
+          tension: 100,
+          friction: 8,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [isNew, slideAnim, fadeAnim]);
 
   return (
-    <View style={styles.container}>
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          transform: [{ translateY: slideAnim }],
+          opacity: fadeAnim,
+        },
+      ]}
+    >
       <TouchableOpacity
         onPress={() => console.log("Toggle task")}
         style={[styles.checkbox, { borderColor: colors.greyBorder }]}
@@ -45,7 +82,7 @@ const Task = ({
           style={styles.deleteIcon}
         />
       </TouchableOpacity>
-    </View>
+    </Animated.View>
   );
 };
 
