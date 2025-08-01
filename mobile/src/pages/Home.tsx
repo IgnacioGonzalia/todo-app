@@ -55,6 +55,14 @@ const Home = () => {
     }, 500);
   };
 
+  const completeTask = (taskId: number) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.bgImageContainer}>
@@ -69,7 +77,11 @@ const Home = () => {
       </View>
       <Header />
       <TaskInput onAddTask={addTask} />
-      <TaskContainer tasks={tasks} newTaskId={newTaskId} />
+      <TaskContainer
+        tasks={tasks}
+        newTaskId={newTaskId}
+        completeTask={completeTask}
+      />
     </View>
   );
 };

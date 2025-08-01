@@ -7,9 +7,14 @@ import { getFontStyle } from "../global/typhography";
 interface TaskContainerProps {
   tasks: Array<{ id: number; text: string; completed: boolean }>;
   newTaskId?: number | null;
+  completeTask: (taskId: number) => void;
 }
 
-const TaskContainer = ({ tasks, newTaskId }: TaskContainerProps) => {
+const TaskContainer = ({
+  tasks,
+  newTaskId,
+  completeTask,
+}: TaskContainerProps) => {
   const { colors } = useTheme();
 
   return (
@@ -21,6 +26,7 @@ const TaskContainer = ({ tasks, newTaskId }: TaskContainerProps) => {
             text={task.text}
             completed={task.completed}
             isNew={task.id === newTaskId}
+            completeTask={() => completeTask(task.id)}
           />
           <View style={styles.divider}></View>
         </React.Fragment>
