@@ -1,4 +1,5 @@
-import { Image, StyleSheet, View } from "react-native";
+import { Image, ScrollView, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../global/ThemeContext";
 import Header from "../components/Header";
 import TaskInput from "../components/TaskInput";
@@ -90,7 +91,9 @@ const Home = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={styles.bgImageContainer}>
         <Image
           source={
@@ -101,19 +104,23 @@ const Home = () => {
           style={styles.bgImage}
         />
       </View>
-      <Header />
-      <TaskInput onAddTask={addTask} />
-      <TaskContainer
-        tasks={filteredTasks}
-        newTaskId={newTaskId}
-        deletingTaskId={deletingTaskId}
-        completeTask={completeTask}
-        deleteTask={deleteTask}
-        currentFilter={filter}
-        clearCompleted={clearCompleted}
-      />
-      {tasks.length > 0 && <TaskFilter filter={filter} setFilter={setFilter} />}
-    </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Header />
+        <TaskInput onAddTask={addTask} />
+        <TaskContainer
+          tasks={filteredTasks}
+          newTaskId={newTaskId}
+          deletingTaskId={deletingTaskId}
+          completeTask={completeTask}
+          deleteTask={deleteTask}
+          currentFilter={filter}
+          clearCompleted={clearCompleted}
+        />
+        {tasks.length > 0 && (
+          <TaskFilter filter={filter} setFilter={setFilter} />
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
