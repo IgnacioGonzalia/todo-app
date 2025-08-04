@@ -15,7 +15,6 @@ const resources = {
 };
 
 const deviceLanguage = Localization.getLocales()[0]?.languageCode || "en";
-console.log("Device language detected:", deviceLanguage);
 
 i18n.use(initReactI18next).init({
   resources,
