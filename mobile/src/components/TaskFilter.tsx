@@ -1,6 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../global/ThemeContext";
 import { getFontStyle } from "../global/typhography";
+import { useTranslation } from "react-i18next";
 
 const TaskFilter = ({
   filter,
@@ -10,6 +11,7 @@ const TaskFilter = ({
   setFilter: (filter: string) => void;
 }) => {
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   const getTextColor = (currentFilter: string) => {
     return filter === currentFilter ? colors.blue : colors.gray;
@@ -26,7 +28,7 @@ const TaskFilter = ({
             },
           ]}
         >
-          All
+          {t("All")}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => setFilter("active")}>
@@ -38,7 +40,7 @@ const TaskFilter = ({
             },
           ]}
         >
-          Active
+          {t("Active")}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => setFilter("completed")}>
@@ -50,7 +52,7 @@ const TaskFilter = ({
             },
           ]}
         >
-          Completed
+          {t("Completed")}
         </Text>
       </TouchableOpacity>
     </View>
@@ -72,6 +74,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+    marginBottom: 72,
   },
   button: {
     ...getFontStyle("bold"),

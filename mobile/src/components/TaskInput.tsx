@@ -2,6 +2,7 @@ import { StyleSheet, TextInput, View } from "react-native";
 import { getFontStyle } from "../global/typhography";
 import { useState } from "react";
 import { useTheme } from "../global/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 const TaskInput = ({
   onAddTask,
@@ -9,6 +10,7 @@ const TaskInput = ({
   onAddTask: (taskText: string) => void;
 }) => {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const [text, setText] = useState<string>("");
 
   const handleEndEditing = () => {
@@ -25,7 +27,7 @@ const TaskInput = ({
       ></View>
       <TextInput
         returnKeyType="done"
-        placeholder="Create a new todo..."
+        placeholder={t("Create a new todo...")}
         placeholderTextColor={colors.placeholder}
         style={[styles.input, { color: colors.text }]}
         value={text}

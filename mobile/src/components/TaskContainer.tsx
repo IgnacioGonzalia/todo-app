@@ -9,6 +9,7 @@ import {
 import Task from "./Task";
 import { useTheme } from "../global/ThemeContext";
 import { getFontStyle } from "../global/typhography";
+import { useTranslation } from "react-i18next";
 
 interface TaskContainerProps {
   tasks: Array<{ id: number; text: string; completed: boolean }>;
@@ -30,6 +31,7 @@ const TaskContainer = ({
   clearCompleted,
 }: TaskContainerProps) => {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
   const buttonOpacity = useRef(new Animated.Value(0)).current;
@@ -163,9 +165,9 @@ const TaskContainer = ({
       ))}
       <View style={styles.footerContainer}>
         <Text style={[styles.text, { color: colors.text }]}>
-          {`${incompleteTaskNumber} task${
-            incompleteTaskNumber !== 1 ? "s" : ""
-          } left`}
+          {`${incompleteTaskNumber} ${
+            incompleteTaskNumber !== 1 ? t("tasks left") : t("task left")
+          }`}
         </Text>
         <Animated.View
           style={{
@@ -178,7 +180,7 @@ const TaskContainer = ({
             disabled={!shouldShowButton}
           >
             <Text style={[styles.text, { color: colors.text }]}>
-              Clear Completed
+              {t("Clear Completed")}
             </Text>
           </TouchableOpacity>
         </Animated.View>
