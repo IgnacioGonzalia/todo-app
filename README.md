@@ -1,4 +1,4 @@
-# todo-app# 🧩 Todo App — Fullstack desde cero (Mobile + API)
+🧩 Todo App — Fullstack desde cero (Mobile + API)
 
 Este proyecto es una implementación **fullstack** del clásico desafío [Todo App de Frontend Mentor](https://www.frontendmentor.io/challenges/todo-app-Su1_KokOW), adaptado para ser una **aplicación móvil desarrollada con Expo y TypeScript**, con una **API backend propia construida con Node.js**.
 
